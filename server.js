@@ -31,31 +31,13 @@ app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname + "/views/about.html"));
 });
 
-app.get("/students", (req, res) => {
-    dataservice.getstudents().then((data) => {
-        res.json({data});
-    }).catch((err) => {
-        res.json({message: err});
-    })
+app.get("/members", (req,res) => {
+    dataService.getAllMembers().then((data)=>{
+        res.json(data); 
+    }).catch((err)=>{
+        res.send(err);
+    });
 });
-
-app.get("/intlstudents", (req, res) => {
-    dataservice.isInternationalStudent().then((data) => {
-        console.log("TODO: get all students who have isInternationalStudent==true")
-        res.json({data});
-    }).catch((err) => {
-        res.json({message: err});
-    })
-});
-
-app.get("/programs", (req, res) => {
-    dataservice.getAllPrograms().then((data) => {
-        res.json({data});
-    }).catch((err) => {
-        res.json({message: err});
-    })
-});
-
 
 app.use((req, res) => {
     res.status(404).send("404 PAGE NOT FOUND");
