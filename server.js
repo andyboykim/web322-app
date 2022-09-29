@@ -12,6 +12,9 @@ var express = require("express");
 var app = express();
 var path = require('path');
 
+var blogService = require(__dirname + "/blog-service.js");
+
+
 onHttpStart = () => {
     console.log('Express http server listening on port ' + HTTP_PORT);
 }
@@ -31,18 +34,12 @@ app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname + "/views/about.html"));
 });
 
-app.get("/members", (req,res) => {
-    dataService.getAllMembers().then((data)=>{
-        res.json(data); 
-    }).catch((err)=>{
-        res.send(err);
-    });
-});
-
 app.use((req, res) => {
-    res.status(404).send("404 PAGE NOT FOUND");
+    res.status(404).send(path.join(_dirname,"views/error404.html"));
   });
-  
-  // listen on port 8080\. The default port for http is 80, https is 443\. We use 8080 here
-  // because sometimes port 80 is in use by other applications on the machine
-  app.listen(HTTP_PORT, onHttpStart);
+
+blogService.initialize().then(() => {
+    app.listen(HTTP_PORT, onHttpStart());
+}).catch (() => {
+    console.log('promises unfulfilled');
+});
