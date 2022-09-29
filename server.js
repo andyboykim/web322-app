@@ -40,7 +40,7 @@ app.get("/students", (req, res) => {
 });
 
 app.get("/intlstudents", (req, res) => {
-    dataservice.getAllisInternationalStudent().then((data) => {
+    dataservice.isInternationalStudent().then((data) => {
         console.log("TODO: get all students who have isInternationalStudent==true")
         res.json({data});
     }).catch((err) => {
@@ -58,7 +58,7 @@ app.get("/programs", (req, res) => {
 
 
 app.use((req, res) => {
-    res.status(404).send("Page Not Found");
+    res.status(404).send("404 PAGE NOT FOUND");
   });
   
   // listen on port 8080\. The default port for http is 80, https is 443\. We use 8080 here
