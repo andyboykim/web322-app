@@ -6,13 +6,25 @@
 * Name: Edward Vuong Student ID: 120246186 Date: Feb 1, 2019 *
 * Online (Heroku) Link: https://tranquil-chamber-71287.herokuapp.com/
 * ********************************************************************************/
+/*********************************************************************************
+*  WEB322 – Assignment 02
+*  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
+*  (including 3rd party web sites) or distributed to other students.
+* 
+*  Name: junwan kim    Student ID: 152183216    Date: 09/30/2022
+*
+*  Online (Cyclic) Link: 
+*
+********************************************************************************/ 
+
 
 var HTTP_PORT = process.env.PORT || 8080;
 var express = require("express");
 var app = express();
 var path = require('path');
+app.use(express.static('img'));
 
-var blogService = require(__dirname + "/blog-service.js");
+var blogService = require("./blog-service.js");
 
 
 onHttpStart = () => {
@@ -35,8 +47,8 @@ app.get('/about', (req, res) => {
 });
 
 app.use((req, res) => {
-    res.status(404).send(path.join(_dirname,"views/error404.html"));
-  });
+    res.status(404).sendFile(path.join(__dirname,"views/error404.html"));
+});
 
 blogService.initialize().then(() => {
     app.listen(HTTP_PORT, onHttpStart());
