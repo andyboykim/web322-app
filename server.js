@@ -1,5 +1,5 @@
 /*********************************************************************************
-* WEB322 – Assignment 02
+* WEB322 – Assignment 03
 * I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part
 * of this assignment has been copied manually or electronically from any other source
 * (including 3rd party web sites) or distributed to other students. *
@@ -7,11 +7,11 @@
 * Online (Heroku) Link: https://tranquil-chamber-71287.herokuapp.com/
 * ********************************************************************************/
 /*********************************************************************************
-*  WEB322 – Assignment 02
+*  WEB322 – Assignment 03
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: junwan kim    Student ID: 152183216    Date: 09/30/2022
+*  Name: junwan kim    Student ID: 152183216    Date: 10/12/2022
 *
 *  Online (Cyclic) Link: https://calm-ruby-lemming-coat.cyclic.app
 *
@@ -78,13 +78,32 @@ app.get('/about', (req, res) => {
 });
 
 app.get("/students/add", function (req, res) {
-    res.sendFile(path.join(__dirname, "/views/addStudents.html"));
+    res.sendFile(path.join(__dirname, "/views/addStudent.html"));
 });
 
 app.get("/images/add", function (req, res) {
-    res.sendFile(path.join(__dirname, "/views/addImages.html"));
+    res.sendFile(path.join(__dirname, "/views/addImage.html"));
 });
   
+app.post("/images/add", upload.single("imageFile"), (req,res) => {
+    res.redirect("/images");
+});
+
+app.get("/images", (req,res) => {
+    fs.readdir("./public/images/uploaded", function(err,items) {
+        res.json(items);
+    })
+});
+
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/employees/add', (req,res) => {
+    dataservice.addEmployee(req.body).then(() => {
+        res.redirect("/employees");
+    })
+});
+
+
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname,"views/error404.html"));
 });
