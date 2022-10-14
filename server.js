@@ -195,16 +195,16 @@ app.post('/images/add', upload.single("imageFile"), (_, res) => {
 })
 
 app.get('/images', (_, res) => {
-	const images = []
+	const images = ["1518109363742.jpg", "1518109363743.jpg"]
 	fs.readdir('./public/images/uploaded', function (err, items) {
 		images.push(items)
 		res.json({ images })
 	});
 })
 
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname,"views/error404.html"));
-});
+app.get('*', (_, res) => {
+	res.status(404).send('Page Not Found')
+})
 
 dataService.initialize().then(() => {
 	app.listen(PORT, () => {
