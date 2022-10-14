@@ -100,16 +100,17 @@ const multer = require('multer')
 const dataService = require('./data-service.js')
 const app = express()
 const PORT = process.env.PORT || 8080
-const upload = multer({ storage: storage })
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({ extended: true }));
 
 const storage = multer.diskStorage({
-	destination: "./public/images/uploaded",
+    destination: "./public/images/uploaded",
 	filename: function (req, file, cb) {
-		cb(null, Date.now() + path.extname(file.originalname))
+        cb(null, Date.now() + path.extname(file.originalname))
 	}
 })
+
+const upload = multer({ storage: storage })
 
 app.get('/', (_, res) => {
 	res.sendFile(__dirname + '/views/home.html')
@@ -201,9 +202,9 @@ app.get('/images', (_, res) => {
 	});
 })
 
-app.get('*', (_, res) => {
-	res.status(404).send('Page Not Found')
-})
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname,"views/error404.html"));
+});
 
 dataService.initialize().then(() => {
 	app.listen(PORT, () => {
