@@ -3,96 +3,11 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: junwan kim    Student ID: 152183216    Date: 10/12/2022
+*  Name: junwan kim    Student ID: 152183216    Date: 10/14/2022
 *
 *  Online (Cyclic) Link: https://calm-ruby-lemming-coat.cyclic.app
 
 ********************************************************************************/ 
-
-/*
-var HTTP_PORT = process.env.PORT || 8080;
-var express = require("express");
-var app = express();
-var path = require('path');
-app.use(express.static('img'));
-const multer = require("multer");
-const upload = multer({ storage: storage });
-app.use(express.static('public'));
-var blogService = require("./blog-service.js");
-app.use(express.urlencoded({ extended: true }));
-const fs = require('fs');
-
-
-onHttpStart = () => {
-    console.log('Express http server listening on port ' + HTTP_PORT);
-}
-
-const storage = multer.diskStorage({
-    destination: "./public/images/uploaded",
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-      }
-});
-
-app.post("/images/add", upload.single("imageFile"), function (req, res) {
-    res.redirect("/images");
-});
-
-app.get("/images", function (req, res) {
-    fs.readdir(path.join(__dirname, imgPath), function (err, items) {
-  
-      var obj = { images: [] };
-      var size = items.length;
-      for (var i = 0; i < items.length; i++) {
-        obj.images.push(items[i]);
-      }
-      res.json(obj);
-    });
-});
-  
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + "/views/home.html"));
-});
-
-//otherwise /home would return an error
-app.get('/home', (req, res) => {
-    res.sendFile(path.join(__dirname + "/views/home.html"));
-});
-
-app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname + "/views/about.html"));
-});
-
-app.get("/students/add", function (req, res) {
-    res.sendFile(path.join(__dirname, "/views/addStudent.html"));
-});
-
-app.get("/images/add", function (req, res) {
-    res.sendFile(path.join(__dirname, "/views/addImage.html"));
-});
-  
-app.post("/images/add", upload.single("imageFile"), (req,res) => {
-    res.redirect("/images");
-});
-
-app.get("/images", (req,res) => {
-    fs.readdir("./public/images/uploaded", function(err,items) {
-        res.json(items);
-    })
-});
-
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname,"views/error404.html"));
-});
-
-blogService.initialize().then(() => {
-    app.listen(HTTP_PORT, onHttpStart());
-}).catch (() => {
-    console.log('promises unfulfilled');
-});
-*/
-
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
@@ -195,7 +110,7 @@ app.post('/images/add', upload.single("imageFile"), (_, res) => {
 })
 
 app.get('/images', (_, res) => {
-	const images = ["1518109363742.jpg", "1518109363743.jpg"]
+	const images = []
 	fs.readdir('./public/images/uploaded', function (err, items) {
 		images.push(items)
 		res.json({ images })
