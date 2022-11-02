@@ -15,8 +15,29 @@ const multer = require('multer')
 const dataService = require('./data-service.js')
 const app = express()
 const PORT = process.env.PORT || 8080
+const exphbs = require("express-handlebars");
+
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({ extended: true }));
+
+app.engine('.hbs', exphbs({ extname: '.hbs',
+                            defaultLayout: "main",
+                            helpers: {       
+                                      navLink: function(url, options){
+                                      return '<li' +
+                                     ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
+                                     '><a href="' + url + '">' + options.fn(this) + '</a></li>';},
+
+                                     equal: function (lvalue, rvalue, options) {
+                                     if (arguments.length < 3)
+                                     throw new Error("Handlebars Helper equal needs 2 parameters");
+                                     if (lvalue != rvalue) {
+                                     return options.inverse(this);
+                                     } else {
+                                     return options.fn(this); }}  
+                  }
+}));
+app.set('view engine', '.hbs');
 
 const storage = multer.diskStorage({
     destination: "./public/images/uploaded",
@@ -28,7 +49,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 app.get('/', (_, res) => {
-	res.sendFile(__dirname + '/views/home.html')
+	//res.sendFile(__dirname + '/views/home.html')
+	res.render("home");
 })
 
 app.get('/about', (_, res) => {
