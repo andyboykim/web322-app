@@ -84,6 +84,24 @@ const getStudentsByStatus = (status) =>
 		resolve(studentsByStatus)
 	})
 
+module.exports.updateStudent = function (studentData) {
+	var found = false;
+	var promise = new Promise((resolve, reject) => {	
+		for (var i=0; i < students.length; i++){
+			if (students[i].studentID == studentData.studentID) {
+				students[i] = studentData;
+				found = true;
+			}
+		}
+		if(found === false) {
+		var err = "Cannot find student to update.";
+		reject({message: err});
+		}  
+		resolve (students);
+		})
+		return promise;
+};
+	
 module.exports = {
 	initialize,
 	getAllStudents,

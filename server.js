@@ -1,9 +1,9 @@
 /*********************************************************************************
-*  WEB322 – Assignment 03
+*  WEB322 – Assignment 04
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: junwan kim    Student ID: 152183216    Date: 10/14/2022
+*  Name: junwan kim    Student ID: 152183216    Date: 11/4/2022
 *
 *  Online (Cyclic) Link: https://calm-ruby-lemming-coat.cyclic.app
 
@@ -15,29 +15,39 @@ const multer = require('multer')
 const dataService = require('./data-service.js')
 const app = express()
 const PORT = process.env.PORT || 8080
-const exphbs = require("express-handlebars");
+const exphbs = require('express-handlebars');
 
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({ extended: true }));
 
-app.engine('.hbs', exphbs({ extname: '.hbs',
-                            defaultLayout: "main",
-                            helpers: {       
-                                      navLink: function(url, options){
-                                      return '<li' +
-                                     ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
-                                     '><a href="' + url + '">' + options.fn(this) + '</a></li>';},
+app.engine('.hbs', exphbs.engine({ 
+	extname: '.hbs',
+	helpers: {
+		navLink: function(url, options){
+			return '<li' + 
+				((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
+				'><a href="' + url + '">' + options.fn(this) + '</a></li>';
+		},
 
-                                     equal: function (lvalue, rvalue, options) {
-                                     if (arguments.length < 3)
-                                     throw new Error("Handlebars Helper equal needs 2 parameters");
-                                     if (lvalue != rvalue) {
-                                     return options.inverse(this);
-                                     } else {
-                                     return options.fn(this); }}  
-                  }
+		equal: function (lvalue, rvalue, options) {
+			if (arguments.length < 3)
+				throw new Error("Handlebars Helper equal needs 2 parameters");
+			if (lvalue != rvalue) {
+				return options.inverse(this);
+			} else {
+				return options.fn(this);
+			}
+		}		
+	}
 }));
 app.set('view engine', '.hbs');
+
+app.use(function(req, res, next){
+    let route = req.baseUrl + req.path;
+    app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
+    next();
+});
+
 
 const storage = multer.diskStorage({
     destination: "./public/images/uploaded",
@@ -54,34 +64,35 @@ app.get('/', (_, res) => {
 })
 
 app.get('/about', (_, res) => {
-	res.sendFile(__dirname + '/views/about.html')
+	//res.sendFile(__dirname + '/views/about.html')
+	res.render("about")
 })
 
 app.get('/students', (req, res) => {
 	const { status, program, credential } = req.query
 	if (status !== undefined) {
 		dataService.getStudentsByStatus(status).then((data) => {
-			res.json(data)
+			res.render("students", {students: data})
 		}).catch((err) => {
-			res.json({ message: err })
+			res.render("students", {message: "no results"});
 		})
 	} else if (program !== undefined) {
 		dataService.getStudentsByProgramCode(program).then((data) => {
-			res.json(data)
+			res.render("students", {students: data})
 		}).catch((err) => {
-			res.json({ message: err })
+			res.render("students", {message: "no results"});
 		})
 	} else if (credential !== undefined) {
 		dataService.getStudentsByExpectedCredential(credential).then((data) => {
-			res.json(data)
+			res.render("students", {students: data})
 		}).catch((err) => {
-			res.json({ message: err })
+			res.render("students", {message: "no results"});
 		})
 	} else {
 		dataService.getAllStudents().then((data) => {
-			res.json(data)
+			res.render("students", {students: data})
 		}).catch((err) => {
-			res.json({ message: err })
+			res.render("students", {message: "no results"});
 		})
 	}
 })
@@ -89,14 +100,15 @@ app.get('/students', (req, res) => {
 app.get('/student/:value', (req, res) => {
 	const { value } = req.params
 	dataService.getStudentById(value).then((data) => {
-		res.json(data)
+		res.render("student", { student: data }); 
 	}).catch((err) => {
-		res.json({ message: err })
+		res.render("student", {message: "no result"}); 
 	})
 })
 
 app.get('/students/add', (_, res) => {
-	res.sendFile(__dirname + '/views/addStudent.html')
+	//res.sendFile(__dirname + '/views/addStudent.html')
+	res.render("addStudent")
 })
 
 app.post('/students/add', (req, res) => {
@@ -106,6 +118,16 @@ app.post('/students/add', (req, res) => {
 		res.json({ message: err })
 	})
 })
+
+app.post("/student/update", (req, res) => {
+    //console.log(req.body);
+	dataService.updateStudent(req.body).then(() => {
+		res.redirect("/students");
+	})
+	.catch((err) => {
+		console.log(err);
+	})
+});
 
 app.get('/intlstudents', (_, res) => {
 	dataService.getInternationalStudents().then((data) => {
@@ -117,14 +139,15 @@ app.get('/intlstudents', (_, res) => {
 
 app.get('/programs', (_, res) => {
 	dataService.getPrograms().then((data) => {
-		res.json(data)
+		res.render("programs", {programs: data});
 	}).catch((err) => {
 		res.json({ message: err })
 	})
 })
 
 app.get('/images/add', (_, res) => {
-	res.sendFile(__dirname + '/views/addImage.html')
+	//res.sendFile(__dirname + '/views/addImage.html')
+	res.render("addImage")
 })
 
 app.post('/images/add', upload.single("imageFile"), (_, res) => {
@@ -135,7 +158,8 @@ app.get('/images', (_, res) => {
 	const images = []
 	fs.readdir('./public/images/uploaded', function (err, items) {
 		images.push(items)
-		res.json({ images })
+		//res.json({ images })
+		res.render("images",{ data: items });
 	});
 })
 
