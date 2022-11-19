@@ -8,170 +8,185 @@
 *  Online (Cyclic) Link: https://calm-ruby-lemming-coat.cyclic.app
 
 ********************************************************************************/ 
-const express = require('express')
-const fs = require('fs')
-const path = require('path')
-const multer = require('multer')
-const dataService = require('./data-service.js')
-const app = express()
-const PORT = process.env.PORT || 8080
+const express = require("express");
+const path = require("path");
+const data = require("./data-service.js");
+const fs = require("fs");
+const multer = require("multer");
 const exphbs = require('express-handlebars');
+const app = express();
 
-app.use(express.static(path.join(__dirname, '/public')));
-app.use(express.urlencoded({ extended: true }));
+const HTTP_PORT = process.env.PORT || 8080;
 
 app.engine('.hbs', exphbs.engine({ 
-	extname: '.hbs',
-	helpers: {
-		navLink: function(url, options){
-			return '<li' + 
-				((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
-				'><a href="' + url + '">' + options.fn(this) + '</a></li>';
-		},
-
-		equal: function (lvalue, rvalue, options) {
-			if (arguments.length < 3)
-				throw new Error("Handlebars Helper equal needs 2 parameters");
-			if (lvalue != rvalue) {
-				return options.inverse(this);
-			} else {
-				return options.fn(this);
-			}
-		}		
-	}
+    extname: '.hbs',
+    defaultLayout: "main",
+    helpers: { 
+        navLink: function(url, options){
+            return '<li' + 
+                ((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
+                '><a href="' + url + '">' + options.fn(this) + '</a></li>';
+        },
+        equal: function (lvalue, rvalue, options) {
+            if (arguments.length < 3)
+                throw new Error("Handlebars Helper equal needs 2 parameters");
+            if (lvalue != rvalue) {
+                return options.inverse(this);
+            } else {
+                return options.fn(this);
+            }
+        }
+    } 
 }));
+
 app.set('view engine', '.hbs');
 
-app.use(function(req, res, next){
+// multer requires a few options to be setup to store files with file extensions
+// by default it won't store extensions for security reasons
+const storage = multer.diskStorage({
+    destination: "./public/images/uploaded",
+    filename: function (req, file, cb) {
+      // we write the filename as the current date down to the millisecond
+      // in a large web service this would possibly cause a problem if two people
+      // uploaded an image at the exact same time. A better way would be to use GUID's for filenames.
+      // this is a simple example.
+      cb(null, Date.now() + path.extname(file.originalname));
+    }
+  });
+  
+  // tell multer to use the diskStorage function for naming files instead of the default.
+  const upload = multer({ storage: storage });
+
+app.use(express.static('public'));
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use(function(req,res,next){
     let route = req.baseUrl + req.path;
     app.locals.activeRoute = (route == "/") ? "/" : route.replace(/\/$/, "");
     next();
 });
 
-
-const storage = multer.diskStorage({
-    destination: "./public/images/uploaded",
-	filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname))
-	}
-})
-
-const upload = multer({ storage: storage })
-
-app.get('/', (_, res) => {
-	//res.sendFile(__dirname + '/views/home.html')
-	res.render("home");
-})
-
-app.get('/about', (_, res) => {
-	//res.sendFile(__dirname + '/views/about.html')
-	res.render("about")
-})
-
-app.get('/students', (req, res) => {
-	const { status, program, credential } = req.query
-	if (status !== undefined) {
-		dataService.getStudentsByStatus(status).then((data) => {
-			res.render("students", {students: data})
-		}).catch((err) => {
-			res.render("students", {message: "no results"});
-		})
-	} else if (program !== undefined) {
-		dataService.getStudentsByProgramCode(program).then((data) => {
-			res.render("students", {students: data})
-		}).catch((err) => {
-			res.render("students", {message: "no results"});
-		})
-	} else if (credential !== undefined) {
-		dataService.getStudentsByExpectedCredential(credential).then((data) => {
-			res.render("students", {students: data})
-		}).catch((err) => {
-			res.render("students", {message: "no results"});
-		})
-	} else {
-		dataService.getAllStudents().then((data) => {
-			res.render("students", {students: data})
-		}).catch((err) => {
-			res.render("students", {message: "no results"});
-		})
-	}
-})
-
-app.get('/student/:value', (req, res) => {
-	const { value } = req.params
-	dataService.getStudentById(value).then((data) => {
-		res.render("student", { student: data }); 
-	}).catch((err) => {
-		res.render("student", {message: "no result"}); 
-	})
-})
-
-app.get('/students/add', (_, res) => {
-	//res.sendFile(__dirname + '/views/addStudent.html')
-	res.render("addStudent")
-})
-
-app.post('/students/add', (req, res) => {
-	dataService.addStudent(req.body).then(() => {
-		res.redirect('/students')
-	}).catch((err) => {
-		res.json({ message: err })
-	})
-})
-
-app.post("/student/update", (req, res) => {
-    //console.log(req.body);
-	dataService.updateStudent(req.body).then(() => {
-		res.redirect("/students");
-	})
-	.catch((err) => {
-		console.log(err);
-	})
+app.get("/", (req,res) => {
+    res.render("home");
 });
 
-app.get('/intlstudents', (_, res) => {
-	dataService.getInternationalStudents().then((data) => {
-		res.json(data)
-	}).catch((err) => {
-		res.json({ message: err })
-	})
-})
+app.get("/about", (req,res) => {
+    res.render("about");
+});
 
-app.get('/programs', (_, res) => {
-	dataService.getPrograms().then((data) => {
-		res.render("programs", {programs: data});
-	}).catch((err) => {
-		res.json({ message: err })
-	})
-})
+app.get("/images/add", (req,res) => {
+    res.render("addImage");
+});
 
-app.get('/images/add', (_, res) => {
-	//res.sendFile(__dirname + '/views/addImage.html')
-	res.render("addImage")
-})
+app.get("/students/add", (req,res) => {
+    res.render("addStudent");
+});
 
-app.post('/images/add', upload.single("imageFile"), (_, res) => {
-	res.redirect('/images')
-})
+app.get("/images", (req,res) => {
+    fs.readdir("./public/images/uploaded", function(err, items) {
+        res.render("images",{images:items});
+    });
+});
 
-app.get('/images', (_, res) => {
-	const images = []
-	fs.readdir('./public/images/uploaded', function (err, items) {
-		images.push(items)
-		//res.json({ images })
-		res.render("images",{ data: items });
-	});
-})
+app.get("/students", (req, res) => {
+    
+   if (req.query.status) {
+        data.getStudentsByStatus(req.query.status).then((data) => {
+            res.render("students", {students:data});
+        }).catch((err) => {
+            res.render("students",{ message: "no results" });
+        });
+    } else if (req.query.program) {
+        data.getStudentsByProgramCode(req.query.program).then((data) => {
+            res.render("students", {students:data});
+        }).catch((err) => {
+            res.render("students",{ message: "no results" });
+        });
+    } else if (req.query.credential) {
+        data.getStudentsByExpectedCredential(req.query.credential).then((data) => {
+            res.render("students", {students:data});
+        }).catch((err) => {
+            res.render("students",{ message: "no results" });
+        });
+    } else {
+        data.getAllStudents().then((data) => {
+            res.render("students", {students:data});
+        }).catch((err) => {
+            res.render("students",{ message: "no results" });
+        });
+    }
+});
 
-app.get('*', (_, res) => {
-	res.status(404).send('Page Not Found')
-})
+app.get("/student/:studentId", (req, res) => {
+    
+    data.getStudentById(req.params.studentId).then((data) => {
+        res.render("student", {student: data});
+    }).catch((err) => {
+        res.render("student",{message: "no results"});
+    });
+});
 
-dataService.initialize().then(() => {
-	app.listen(PORT, () => {
-		console.log(`Express http server listening on ${PORT}`)
-	})
-})
-.catch((err) => {
-	console.log(err)
-})
+app.get("/intlstudents", (req,res) => {
+    data.getInternationalStudents().then((data)=>{
+        res.json(data);
+    });
+});
+
+app.get("/programs", (req,res) => {
+    data.getPrograms().then((data)=>{
+        res.render("programs",{programs:data});
+    });
+});
+
+app.post("/students/add", (req, res) => {
+    data.addStudent(req.body).then(()=>{
+      res.redirect("/students"); 
+    });
+});
+
+app.post("/images/add", upload.single("imageFile"), (req,res) =>{
+    res.redirect("/images");
+});
+
+app.post("/student/update", (req, res) => {
+    data.updateStudent(req.body).then(()=>{
+    res.redirect("/students");
+  });
+  
+});
+
+app.get("/programs/add", (req,res) => {
+    res.render("addPrograms");
+});
+
+app.post("/programs/add", (req, res) => {
+    data.addProgram(req.body).then(()=>{
+      res.redirect("/programs"); 
+    });
+});
+
+app.get("/program/:programCode", (req, res) => {
+    
+    data.getProgramByCode(req.params.programCode)
+    .then((data) => {res.render("program", { program: data })})
+    .catch(err => res.status(404).send("program not found"))
+});
+
+app.get('/programs/delete/:programCode', (req,res) => {
+    data.deleteProgramByCode(req.params.pcode)
+    .then(res.redirect("/programs"))
+    .catch(err => res.status(500).send("Unable to Remove Program / Program not found"))
+});
+
+app.use((req, res) => {
+    res.status(404).send("Page Not Found");
+  });
+
+data.initialize().then(function(){
+    app.listen(HTTP_PORT, function(){
+        console.log("app listening on: " + HTTP_PORT)
+    });
+}).catch(function(err){
+    console.log("unable to start server: " + err);
+});
