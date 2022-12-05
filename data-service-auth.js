@@ -19,7 +19,7 @@ let User; //to be defined on new connection (see initialize)
 
 module.exports.initialize = () => {
     return new Promise((resolve,reject) => {
-        let db = mongoose.createConnection("mongodb+srv://andykim:Helloman12056@senecaweb.l1jeaj5.mongodb.net/SenecaWeb?retryWrites=true&w=majority", { useNewUrlParser: true });
+        let db = mongoose.createConnection("mongodb+srv://andykim:Helloman12056@senecaweb.l1jeaj5.mongodb.net/web322_week8?retryWrites=true&w=majority");
         db.on('error', (err) => {
             reject(err);
         })

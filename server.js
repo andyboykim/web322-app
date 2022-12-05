@@ -21,6 +21,10 @@ const clientSessions = require('client-sessions');
 
 const HTTP_PORT = process.env.PORT || 8080;
 
+const onHttpStart = () => {
+    console.log("Express http server listening on port " + HTTP_PORT);
+};
+
 app.engine('.hbs', exphbs.engine({ 
     extname: '.hbs',
     defaultLayout: "main",
@@ -329,9 +333,9 @@ app.get("/programs/delete/:programCode", ensureLogin, (req,res)=>{
 data.initialize()
 .then(dataServiceAuth.initialize())
 .then(() => {
-    app.listen(HTTP_PORT, onHttpStart())
-}).catch (() => {
-    console.log('promises unfulfilled');
+    app.listen(HTTP_PORT, onHttpStart)
+}).catch ((err) => {
+    console.log(err);
 });
 
 
