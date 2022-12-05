@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,7 +7,8 @@
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <!-- Latest compiled and minified Bootstrap 3.3.7 CSS -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-      <title>Home</title>
+      <link rel="stylesheet" href="/css/site.css" type="text/css" />
+      <title>WEB322</title>
   </head>
   <body>
     <nav class="navbar navbar-default">
@@ -19,7 +21,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <span class="navbar-brand" href="#">WEB322 - junwan kim</span>
+          <span class="navbar-brand" href="#">WEB322 (A5) - W Song</span>
         </div>
     
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -27,14 +29,33 @@
           <ul class="nav navbar-nav">
             {{#navLink "/"}}Home{{/navLink}}
             {{#navLink "/about"}}About{{/navLink}}
-            <!--{{#navLink "/students/add"}}Add Student{{/navLink}}
-            {{#navLink "/images/add"}}Add Image{{/navLink}}-->
           </ul>
+           {{#if session.user}}
+          <form class="navbar-form navbar-right">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="userMenu" data-toggle="dropdown">
+                <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{session.user.userName}}&nbsp;&nbsp;<span class="caret"></span>
+              </button>
+              
+              <ul class="dropdown-menu" aria-labelledby="userMenu">
+                <li><a href="/userHistory">User History</a></li>
+                <li><a href="/logout">Logout</a></li>
+              </ul>
+            </div>
+          </form>
           <ul class="nav navbar-nav navbar-right">
-            {{#navLink "/images"}}Images{{/navLink}}
-            {{#navLink "/students"}}Students{{/navLink}}
-            {{#navLink "/programs"}}Programs{{/navLink}}
+              {{#navLink "/images"}}Images{{/navLink}}
+              {{#navLink "/students"}}Students{{/navLink}}
+              {{#navLink "/programs"}}Programs{{/navLink}}
           </ul>
+
+          {{else}}
+          <form class="navbar-form navbar-right">
+            <a href="/register" class="btn btn-success"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;Register</a>
+            <a href="/login" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;&nbsp;Log In</a>
+          </form>
+          {{/if}}
+
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
@@ -49,3 +70,4 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   </body>
 </html>
+

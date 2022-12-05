@@ -1,48 +1,37 @@
-<div class="row">
-    <div class="col-md-12">
-        {{#each department}}
-        <h1>{{programName }} - Program Code: {{programCode}}</h1>
-        <form method="POST" action="/program/update">
-        <fieldset>
-            <input type="hidden" name="programCode" value="{{data.programCode}}">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="program Name">Department Name:</label>
-                        <input class="form-control" id="programName" name="programName" type="text" value="{{data.programCode}}" />
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-        <hr />
-        <input type="submit" class="btn btn-primary pull-right" value="Update Department" /><br /><br /><br />
-        </form> {{/each}}
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-12">
-        <h2>{{programName }} - Program Code: {{programCode}}</h2>
+
+        <h2>{{data.programName}} - Program Code: {{data.programCode}}</h2>
+        <hr />
+
         <form method="post" action="/program/update">
-        <fieldset>
-            <input type="hidden" name="programCode" value="{{data.programCode}}">
+
+            {{!-- <input type="hidden" name="programCode" value="{{data.programCode}}" /> --}}
+
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
-                        <label for="program Code">Program Code:</label>
-                        <input class="form-control" id="programCode" name="programCode" type="text" value="{{data.programCode}}" />
+                        <label for="programCode">Program Code</label>
+                        <input class="form-control" id="programCode" name="programCode" type="text" value="{{data.programCode}}" readonly/>
                     </div>
                 </div>
             </div>
+
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
-                        <label for="program Name">Program Name:</label>
-                        <input class="form-control" id="programName" name="programName" type="text" value="{{data.programName}}">
+                        <label for="programName">Program Name</label>
+                        <input class="form-control" id="programName" name="programName" type="text" value="{{data.programName}}" />
                     </div>
                 </div>
             </div>
-            <input type="submit" class="btn btn-primary pull-left" value="update Program">
+              
+            <hr />
+
+            <input type="submit" class="btn btn-primary pull-right" value="Update Program" /><br /><br /><br />
+
         </form>
     </div>
 </div>
+

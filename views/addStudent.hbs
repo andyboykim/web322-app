@@ -89,7 +89,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="programCode">Program:</label>
-                            <select class="form-control" name="program" id="program">
+                            {{!-- <select class="form-control" name="program" id="program">
                                 <option value="ACF">ACF - Accounting and Finance</option>
                                 <option value="AVO">AVO - Aviation Operations</option>
                                 <option value="DAN">DAN - 3D Animation</option>
@@ -100,7 +100,18 @@
                                 <option value="BSD">BSD - Software Development (Honours Bachelor of Technology)</option>
                                 <option value="IFS">IFS - Informatics and Security(Honours Bachelor of Technology)</option>
                                 <option value="DAS">DAS - Data Science and Analytics program (Honours Bachelor of Technology)</option>
-                            </select>
+                            </select> --}}
+                            {{#if programs}}
+                                <select class="form-control" name="program" id="program">
+                                        <option value="">Select Program</option>
+                                        {{#each programs}}
+                                            <option value="{{programCode}}">{{programCode}} - {{programName}}</option>
+                                        {{/each}}
+                                </select>
+                            {{else}}
+                                <div>No Programs</div>
+                            {{/if}}
+
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -133,4 +144,4 @@
 
         </form>
     </div>
-</div>s
+</div>
